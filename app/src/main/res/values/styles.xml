@@ -1,0 +1,31 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="SeekBarRed"
+        parent="Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/SeekBarRed</item>
+    </style>
+
+    <style name="SeekBarGreen"
+        parent="Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/SeekBarGreen</item>
+    </style>
+
+    <style name="SeekBarBlue"
+        parent="Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/SeekBarBlue</item>
+    </style>
+
+</resources>

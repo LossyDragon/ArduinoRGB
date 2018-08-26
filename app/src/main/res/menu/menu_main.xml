@@ -1,0 +1,19 @@
+<menu
+    android:id="@+id/menu_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.lossydragon.arduinoropergb.MainActivity">
+
+    <item
+        android:id="@+id/menu_connect"
+        android:orderInCategory="100"
+        android:title="@string/menu_connect"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_settings"
+        android:orderInCategory="100"
+        android:title="@string/menu_settings"
+        app:showAsAction="never" />
+</menu>
