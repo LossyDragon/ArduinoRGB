@@ -7,7 +7,8 @@ Right now, this is just the android app.
 # Resources
 Some parts of the application are sampled from the following github projects
 
-https://github.com/hmartiro/android-arduino-bluetooth
-https://github.com/duanhong169/ColorPicker
+[hmartiro-arduino-bluetooth](https://github.com/hmartiro/android-arduino-bluetooth)
+and
+[duanhong169-ColorPicker](https://github.com/duanhong169/ColorPicker)
 
 other libraries are listed in the apps build.gradle.
