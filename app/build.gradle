@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.android.support:support-v4:28.0.0-rc01'
     implementation 'com.android.support:preference-v7:28.0.0-rc01'
     //Custom implementations
+    implementation 'cat.ereza:customactivityoncrash:2.2.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
     kapt 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha05'

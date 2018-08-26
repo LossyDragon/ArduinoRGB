@@ -3,7 +3,6 @@ package com.lossydragon.arduinorgb
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.widget.FrameLayout
 import android.content.Intent
@@ -24,6 +23,7 @@ import com.lossydragon.arduinorgb.fragment.FragmentRgb
 
 import butterknife.BindView
 import butterknife.ButterKnife
+import cat.ereza.customactivityoncrash.config.CaocConfig
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -46,6 +46,17 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Setup crash handler since its not a G play app.
+        CaocConfig.Builder.create()
+                .backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT)
+                .enabled(true)
+                .showErrorDetails(true)
+                .showRestartButton(true)
+                .logErrorOnRestart(true)
+                .trackActivities(true)
+                .apply()
+
         setContentView(R.layout.activity_main)
 
         ButterKnife.bind(this)
@@ -79,8 +90,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     Toast.makeText(applicationContext, R.string.toastNoPair, Toast.LENGTH_LONG).show()
                 }
             } else {
-                if(bluetoothThread!!.isConnected)
-                    interruptBluetooth()
+                if (bluetoothThread != null) {
+                    bluetoothThread!!.interrupt()
+                    bluetoothThread = null
+                }
             }
         }
 
@@ -88,19 +101,24 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             Log.v(TAG, "Created...")
     }
 
+    @SuppressLint("PrivateResource")
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val transaction = supportFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
         when (item.itemId) {
             R.id.navigation_rgb -> {
                 transaction.replace(R.id.content, FragmentRgb()).commit()
+                fragmentInt = 0
                 return true
             }
             R.id.navigation_hex -> {
                 transaction.replace(R.id.content, FragmentHex()).commit()
+                fragmentInt = 1
                 return true
             }
             R.id.navigation_hue -> {
                 transaction.replace(R.id.content, FragmentHue()).commit()
+                fragmentInt = 2
                 return true
             }
         }
@@ -113,6 +131,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         devicesList.clear()
         val pairedDevices = bluetoothComms.pairedDevices
+
         if (pairedDevices.isNotEmpty()) {
             for (device in pairedDevices) {
                 val devices = Devices(device.name, device.address)
@@ -148,7 +167,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     @SuppressLint("HandlerLeak")
     private fun startBluetoothThread(macAddress: String?) {
-        if (bluetoothThread != null || macAddress == null) { return }
+        if (bluetoothThread != null || macAddress == null)
+            return
 
         bluetoothThread = BluetoothThread(macAddress, object : Handler() {
 
@@ -184,31 +204,28 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     @SuppressLint("PrivateResource")
     public override fun onResume() {
         super.onResume()
-        var selectedFragment: Fragment? = null
+        val transaction = supportFragmentManager.beginTransaction()
         val prefs = getSharedPreferences(PREFERENCES, 0)
         this.navigation.menu.getItem(prefs.getInt(LAST_FRAGMENT, 0)).isChecked = true
 
-        when(prefs.getInt(LAST_FRAGMENT, 0)){
-            0 -> selectedFragment = FragmentRgb.newInstance()
-            1 -> selectedFragment = FragmentHex.newInstance()
-            2 -> selectedFragment = FragmentHue.newInstance()
+        when (prefs.getInt(LAST_FRAGMENT, 0)) {
+            0 -> transaction.replace(R.id.content, FragmentRgb()).commit()
+            1 -> transaction.replace(R.id.content, FragmentHex()).commit()
+            2 -> transaction.replace(R.id.content, FragmentHue()).commit()
         }
 
-        if(prefs.getInt(PreferenceActivity.AUTO_CONNECT, 0) == 1) {
+        requestBluetooth()
+
+        if (prefs.getInt(PreferenceActivity.AUTO_CONNECT, 0) == 1) {
             menuSwitch.isChecked = true
             startBluetoothThread(btMac)
         }
-
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.setCustomAnimations(R.anim.design_bottom_sheet_slide_in, R.anim.design_bottom_sheet_slide_out)
-        transaction.replace(R.id.content, selectedFragment!!)
-        transaction.commit()
-
-        requestBluetooth()
     }
 
     public override fun onPause() {
         super.onPause()
+
+        //Save last fragment app was on.
         val editor = getSharedPreferences(PREFERENCES, 0).edit()
         editor.putInt(LAST_FRAGMENT, fragmentInt)
         editor.apply()
@@ -217,9 +234,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private fun requestBluetooth() {
-        if (!this.bluetoothComms.isEnabled) {
+        if (!this.bluetoothComms.isEnabled)
             this.bluetoothComms.requestBluetooth()
-        }
     }
 
     private fun interruptBluetooth() {
