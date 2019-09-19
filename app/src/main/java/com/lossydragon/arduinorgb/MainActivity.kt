@@ -1,18 +1,21 @@
 package com.lossydragon.arduinorgb
 
 import android.annotation.SuppressLint
-import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
-import android.support.v7.app.AppCompatActivity
-import android.widget.FrameLayout
 import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.util.Log
 import android.view.MenuItem
-import android.widget.*
+import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
+import cat.ereza.customactivityoncrash.config.CaocConfig
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.customListAdapter
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lossydragon.arduinorgb.bluetooth.BluetoothComms
 import com.lossydragon.arduinorgb.bluetooth.BluetoothConnectAdapter
 import com.lossydragon.arduinorgb.bluetooth.BluetoothThread
@@ -20,19 +23,10 @@ import com.lossydragon.arduinorgb.bluetooth.Devices
 import com.lossydragon.arduinorgb.fragment.FragmentHex
 import com.lossydragon.arduinorgb.fragment.FragmentHue
 import com.lossydragon.arduinorgb.fragment.FragmentRgb
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.toolbar.*
 
-import butterknife.BindView
-import butterknife.ButterKnife
-import cat.ereza.customactivityoncrash.config.CaocConfig
-
-class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
-
-    @BindView(R.id.btn_menu) lateinit var menuButton: ImageButton
-    @BindView(R.id.toolbar_title) lateinit var toolBarTitle: TextView
-    @BindView(R.id.toolbar_status) lateinit var toolbarStatus: TextView
-    @BindView(R.id.switch_onOff) lateinit var menuSwitch: Switch
-    @BindView(R.id.content) lateinit var content: FrameLayout
-    @BindView(R.id.navigation) lateinit var navigation: BottomNavigationView
+class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener, BluetoothConnectAdapter.ConnectCallback {
 
     private val devicesList = ArrayList<Devices>()
     internal var bluetoothThread: BluetoothThread? = null
@@ -43,9 +37,13 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     private var dialog: MaterialDialog? = null
     private var fragmentInt: Int = 0
 
+    private lateinit var prefs: SharedPreferences
+
     @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         //Setup crash handler since its not a G play app.
         CaocConfig.Builder.create()
@@ -59,7 +57,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         setContentView(R.layout.activity_main)
 
-        ButterKnife.bind(this)
         navigation.setOnNavigationItemSelectedListener(this)
         bluetoothComms = BluetoothComms(this)
 
@@ -67,8 +64,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         btName = getSharedPreferences(PREFERENCES, 0).getString(DEVICE_NAME, "null")
 
         //Menu Options
-        menuButton.setOnClickListener {
-            val popup = PopupMenu(this@MainActivity, menuButton)
+        btn_menu.setOnClickListener {
+            val popup = PopupMenu(this@MainActivity, btn_menu)
             popup.menuInflater.inflate(R.menu.menu_main, popup.menu)
             popup.show()
             popup.setOnMenuItemClickListener { item ->
@@ -81,12 +78,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
 
         //Menu on/off Switch
-        menuSwitch.setOnCheckedChangeListener { _, isChecked ->
+        switch_onOff.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (btMac != null || btMac != "null") {
                     startBluetoothThread(btMac)
                 } else {
-                    menuSwitch.isChecked = false
+                    switch_onOff.isChecked = false
                     Toast.makeText(applicationContext, R.string.toastNoPair, Toast.LENGTH_LONG).show()
                 }
             } else {
@@ -127,25 +124,28 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     //Function to handle when Menu Connect is pressed.
     private fun listDevices() {
-        val adapter = BluetoothConnectAdapter(devicesList)
 
         devicesList.clear()
-        val pairedDevices = bluetoothComms.pairedDevices
-
-        if (pairedDevices.isNotEmpty()) {
-            for (device in pairedDevices) {
-                val devices = Devices(device.name, device.address)
-                devicesList.add(devices)
+        if (bluetoothComms.pairedDevices.isNotEmpty()) {
+            for (device in bluetoothComms.pairedDevices) {
+                devicesList.add(
+                        Devices(device.name, device.address)
+                )
             }
         }
 
         //Custom dialog and pair on callback
         dialog = MaterialDialog(this)
                 .title(R.string.connectTo)
-                .customListAdapter(adapter)
+                .customListAdapter(
+                        BluetoothConnectAdapter(this, devicesList)
+                )
 
-        adapter.setCallbacks(this::pairDevice)
         dialog?.show()
+    }
+
+    override fun onCallback(string: String) {
+        pairDevice(string)
     }
 
     private fun pairDevice(deviceInfo: String) {
@@ -173,24 +173,23 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         bluetoothThread = BluetoothThread(macAddress, object : Handler() {
 
             override fun handleMessage(message: Message) {
-                val s = message.obj as String
-                when (s) {
+                when (val s = message.obj) {
                     "CONNECTED" -> {
-                        toolBarTitle.text = getString(R.string.status_connected, btName)
-                        menuSwitch.isChecked = true
+                        toolbar_title.text = getString(R.string.status_connected, btName)
+                        switch_onOff.isChecked = true
                     }
                     "DISCONNECTED" -> {
-                        toolBarTitle.setText(R.string.status_not_connected)
-                        menuSwitch.isChecked = false
+                        toolbar_title.setText(R.string.status_not_connected)
+                        switch_onOff.isChecked = false
                     }
                     "CONNECTION FAILED" -> {
-                        toolBarTitle.setText(R.string.status_failed)
-                        menuSwitch.isChecked = false
+                        toolbar_title.setText(R.string.status_failed)
+                        switch_onOff.isChecked = false
                         bluetoothThread = null
                     }
                     else -> {
-                        Log.v(TAG, s)
-                        toolbarStatus.text = getString(R.string.text_RX, s)
+                        Log.v(TAG, s.toString())
+                        toolbar_status.text = getString(R.string.text_RX, s)
                     }
                 }
             }
@@ -198,7 +197,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         writeHandler = bluetoothThread!!.writeHandler
         bluetoothThread!!.start()
-        toolBarTitle.setText(R.string.status_connecting)
+        toolbar_title.setText(R.string.status_connecting)
     }
 
     @SuppressLint("PrivateResource")
@@ -209,15 +208,15 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         this.navigation.menu.getItem(prefs.getInt(LAST_FRAGMENT, 0)).isChecked = true
 
         when (prefs.getInt(LAST_FRAGMENT, 0)) {
-            0 -> transaction.replace(R.id.content, FragmentRgb()).commit()
-            1 -> transaction.replace(R.id.content, FragmentHex()).commit()
-            2 -> transaction.replace(R.id.content, FragmentHue()).commit()
+            0 -> transaction.replace(R.id.content, FragmentRgb.newInstance()).commit()
+            1 -> transaction.replace(R.id.content, FragmentHex.newInstance()).commit()
+            2 -> transaction.replace(R.id.content, FragmentHue.newInstance()).commit()
         }
 
         requestBluetooth()
 
-        if (prefs.getInt(PreferenceActivity.AUTO_CONNECT, 0) == 1) {
-            menuSwitch.isChecked = true
+        if (prefs.getBoolean(PreferenceActivity.PREF_RECONNECT, true)) {
+            switch_onOff.isChecked = true
             startBluetoothThread(btMac)
         }
     }
@@ -240,26 +239,22 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     private fun interruptBluetooth() {
         //Kill the thread if not null
-        if (bluetoothThread != null) {
-            bluetoothThread!!.interrupt()
-            bluetoothThread = null
-        }
+        bluetoothThread?.interrupt()
+        bluetoothThread = null
 
         //Set actionbar switch to off
-        menuSwitch.isChecked = false
+        switch_onOff.isChecked = false
     }
 
     //Write to the Bluetooth module
     fun writeRgb(v: IntArray) {
-        //val data = v.joinToString(","){it.toString()}
         //R, G, B, L
         val data = "R" + v[0] + "G" + v[1] + "B" + v[2] + "L" + v[3]
 
         val msg = Message.obtain()
         msg.obj = data
 
-        if (writeHandler != null)
-            writeHandler!!.sendMessage(msg)
+        writeHandler?.sendMessage(msg)
     }
 
     companion object {

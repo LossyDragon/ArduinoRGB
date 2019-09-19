@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.lossydragon.arduinorgb.colorpicker.ColorPickerView
-        android:id="@+id/colorPickerView"
+    <top.defaults.colorpicker.ColorPickerView
+        android:id="@+id/colorPickerView_rgb"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
+        app:enableAlpha="false"
+        app:enableBrightness="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Red Seek Bar -->
     <LinearLayout
@@ -35,22 +36,22 @@
         android:layout_marginTop="16dp"
         android:max="255"
         android:progress="50"
-        tools:theme="@style/SeekBarRed"
         android:theme="@style/SeekBarRed"
         app:layout_constraintEnd_toStartOf="@id/textView_R"
-        app:layout_constraintLeft_toLeftOf="@id/colorPickerView"
-        app:layout_constraintRight_toRightOf="@id/colorPickerView"
-        app:layout_constraintStart_toStartOf="@+id/colorPickerView"
-        app:layout_constraintTop_toBottomOf="@+id/colorPickerView" />
+        app:layout_constraintLeft_toLeftOf="@id/colorPickerView_rgb"
+        app:layout_constraintRight_toRightOf="@id/colorPickerView_rgb"
+        app:layout_constraintStart_toStartOf="@+id/colorPickerView_rgb"
+        app:layout_constraintTop_toBottomOf="@+id/colorPickerView_rgb"
+        tools:theme="@style/SeekBarRed" />
 
     <TextView
         android:id="@+id/textView_R"
         android:layout_width="25dp"
         android:layout_height="20dp"
-        android:text="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekBar_R"
-        app:layout_constraintEnd_toEndOf="@id/colorPickerView"
-        app:layout_constraintTop_toTopOf="@id/seekBar_R" />
+        app:layout_constraintEnd_toEndOf="@id/colorPickerView_rgb"
+        app:layout_constraintTop_toTopOf="@id/seekBar_R"
+        tools:text="255" />
 
     <!-- Green Seek Bar -->
     <LinearLayout
@@ -71,22 +72,22 @@
         android:layout_marginTop="16dp"
         android:max="255"
         android:progress="50"
-        tools:theme="@style/SeekBarGreen"
         android:theme="@style/SeekBarGreen"
         app:layout_constraintEnd_toStartOf="@+id/textView_G"
-        app:layout_constraintLeft_toLeftOf="@id/colorPickerView"
-        app:layout_constraintRight_toRightOf="@id/colorPickerView"
-        app:layout_constraintStart_toStartOf="@+id/colorPickerView"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar_R" />
+        app:layout_constraintLeft_toLeftOf="@id/colorPickerView_rgb"
+        app:layout_constraintRight_toRightOf="@id/colorPickerView_rgb"
+        app:layout_constraintStart_toStartOf="@+id/colorPickerView_rgb"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar_R"
+        tools:theme="@style/SeekBarGreen" />
 
     <TextView
         android:id="@+id/textView_G"
         android:layout_width="25dp"
         android:layout_height="20dp"
-        android:text="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekBar_G"
-        app:layout_constraintEnd_toEndOf="@id/colorPickerView"
-        app:layout_constraintTop_toTopOf="@id/seekBar_G" />
+        app:layout_constraintEnd_toEndOf="@id/colorPickerView_rgb"
+        app:layout_constraintTop_toTopOf="@id/seekBar_G"
+        tools:text="255" />
 
     <!-- Blue Seek Bar -->
     <LinearLayout
@@ -107,22 +108,22 @@
         android:layout_marginTop="16dp"
         android:max="255"
         android:progress="50"
-        tools:theme="@style/SeekBarBlue"
         android:theme="@style/SeekBarBlue"
         app:layout_constraintEnd_toStartOf="@+id/textView_B"
-        app:layout_constraintLeft_toLeftOf="@id/colorPickerView"
-        app:layout_constraintRight_toRightOf="@id/colorPickerView"
-        app:layout_constraintStart_toStartOf="@+id/colorPickerView"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar_G" />
+        app:layout_constraintLeft_toLeftOf="@id/colorPickerView_rgb"
+        app:layout_constraintRight_toRightOf="@id/colorPickerView_rgb"
+        app:layout_constraintStart_toStartOf="@+id/colorPickerView_rgb"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar_G"
+        tools:theme="@style/SeekBarBlue" />
 
     <TextView
         android:id="@+id/textView_B"
         android:layout_width="25dp"
         android:layout_height="20dp"
-        android:text="255"
         app:layout_constraintBottom_toBottomOf="@+id/seekBar_B"
-        app:layout_constraintEnd_toEndOf="@id/colorPickerView"
-        app:layout_constraintTop_toTopOf="@id/seekBar_B" />
+        app:layout_constraintEnd_toEndOf="@id/colorPickerView_rgb"
+        app:layout_constraintTop_toTopOf="@id/seekBar_B"
+        tools:text="255" />
 
     <!-- MaterialDialogs color picker -->
     <ImageButton
@@ -130,12 +131,12 @@
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/desc_dialogMenu"
         android:src="@drawable/ic_menu_rgb"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

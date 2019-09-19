@@ -2,32 +2,21 @@ package com.lossydragon.arduinorgb.fragment
 
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.text.*
+import android.text.Editable
+import android.text.Selection
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.SeekBar
-import butterknife.BindView
-import butterknife.ButterKnife
+import androidx.fragment.app.Fragment
 import com.lossydragon.arduinorgb.MainActivity
 import com.lossydragon.arduinorgb.R
-import com.lossydragon.arduinorgb.colorpicker.ColorPickerView
-
+import kotlinx.android.synthetic.main.fragment_hex.*
+import java.util.*
 
 //TODO stop softinput from pushing actionbar up
 class FragmentHex : Fragment() {
-
-    @BindView(R.id.colorPickerView_Hex)
-    internal lateinit var hexColorPicker: ColorPickerView
-    @BindView(R.id.editText_hex)
-    internal lateinit var hexEditText: EditText
-    @BindView(R.id.seekbar_hex)
-    internal lateinit var hexSeekBar: SeekBar
-
-    private var hexValues: IntArray? = null
-    private val prefix = "#"
 
     companion object {
         fun newInstance(): FragmentHex {
@@ -38,48 +27,57 @@ class FragmentHex : Fragment() {
         }
     }
 
+    private var hexValues: IntArray = IntArray(4)
+    private val prefix = "#"
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val view = inflater.inflate(R.layout.fragment_hex, container, false)
-        hexValues = IntArray(4)
-        ButterKnife.bind(this, view)
+        return inflater.inflate(R.layout.fragment_hex, container, false)
+    }
 
-        hexColorPicker.subscribe { color, _ -> colorHex(color) }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        colorPickerView_Hex.subscribe { color, _, _ ->
+            colorHex(color)
+        }
 
         //TODO editText Caps only and No suggestions.
 
         checkSeek()
-
-        return view
     }
 
     private fun checkSeek() {
 
-        hexSeekBar.setOnSeekBarChangeListener(
-                object : SeekBar.OnSeekBarChangeListener {
+        seekbar_hex.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                hexValues[3] = progress
+            }
 
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        hexValues!![3] = progress
-                    }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                //Nothing
+            }
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                    override fun onStopTrackingTouch(seekBar: SeekBar) {
-                        sendValues()
-                    }
-                }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                sendValues()
+            }
+        }
         )
 
-        hexEditText.addTextChangedListener(object : TextWatcher {
+        editText_hex.addTextChangedListener(object : TextWatcher {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                //Nothing
+            }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                //Nothing
+            }
 
             override fun afterTextChanged(s: Editable) {
                 if (!s.toString().startsWith(prefix)) {
-                    hexEditText.setText(prefix)
-                    Selection.setSelection(hexEditText.text, hexEditText.text.length)
+                    editText_hex.setText(prefix)
+                    Selection.setSelection(editText_hex.text, editText_hex.text.length)
 
                 }
 
@@ -88,18 +86,18 @@ class FragmentHex : Fragment() {
     }
 
     private fun colorHex(color: Int) {
-        hexValues!![0] = Color.red(color)
-        hexValues!![1] = Color.green(color)
-        hexValues!![2] = Color.blue(color)
+        hexValues[0] = Color.red(color)
+        hexValues[1] = Color.green(color)
+        hexValues[2] = Color.blue(color)
 
-        hexEditText.setText(String.format("#%02x%02x%02x",
-                hexValues!![0], hexValues!![1], hexValues!![2]).toUpperCase())
+        editText_hex.setText(String.format("#%02x%02x%02x",
+                hexValues[0], hexValues[1], hexValues[2]).toUpperCase(Locale.getDefault()))
 
         sendValues()
     }
 
     //Dirty, but works.
     private fun sendValues() {
-        (this.context as MainActivity).writeRgb(hexValues!!)
+        (this.context as MainActivity).writeRgb(hexValues)
     }
 }

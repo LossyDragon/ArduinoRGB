@@ -1,18 +1,17 @@
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="56dp"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="56dp">
 
     <TextView
         android:id="@+id/toolbar_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:gravity="center_vertical"
         android:hint="Disconnected..."
@@ -42,8 +41,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:ellipsize="end"
-        android:maxLines="1"
         android:maxWidth="200dp"
+        android:maxLines="1"
         android:text="..."
         android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/switch_onOff"
@@ -56,19 +55,18 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/btn_menu"
-        />
+        app:layout_constraintEnd_toStartOf="@+id/btn_menu" />
 
     <ImageButton
         android:id="@+id/btn_menu"
+        style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_menu"
-        android:background="?android:selectableItemBackground"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_goneMarginEnd="4dp"
+        android:background="?android:selectableItemBackground"
         android:contentDescription="@string/desc_activityMenu"
-        style="@style/Widget.AppCompat.ImageButton"/>
+        android:src="@drawable/ic_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_goneMarginEnd="4dp" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

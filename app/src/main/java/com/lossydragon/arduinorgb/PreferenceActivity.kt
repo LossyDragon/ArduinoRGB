@@ -1,52 +1,24 @@
 package com.lossydragon.arduinorgb
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.MenuItem
-import android.widget.Switch
-import butterknife.BindView
-import butterknife.ButterKnife
-
+import androidx.appcompat.app.AppCompatActivity
 
 class PreferenceActivity : AppCompatActivity() {
 
-    @BindView(R.id.pref_switch_autoConnect) lateinit var autoSwitch: Switch
-
-    companion object {
-        private const val TAG = "PreferenceActivity"
-        const val PREFERENCES = "com.lossydragon.arduinorgb.preferences"
-        const val AUTO_CONNECT = "auto_connect"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_preference)
-        ButterKnife.bind(this)
+        setContentView(R.layout.pref_layout)
 
-        if(supportActionBar != null)
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        Log.i(TAG, "Opened")
-
-        val prefs = getSharedPreferences(PREFERENCES, 0)
-        val auto = prefs.getInt(AUTO_CONNECT, 1)
-
-        autoSwitch.isChecked = auto != 0
-
-        autoSwitch.setOnCheckedChangeListener { _, isChecked ->
-            val prefs2 = getSharedPreferences(PREFERENCES, 0).edit()
-
-            if (isChecked) {
-                prefs2.putInt(AUTO_CONNECT, 1)
-                //Toast.makeText(this, "Auto Connect enabled.", Toast.LENGTH_LONG).show()
-            }else {
-                prefs2.putInt(AUTO_CONNECT, 0)
-                //Toast.makeText(this, "Auto Connect disabled.", Toast.LENGTH_LONG).show()
-            }
-
-            prefs2.apply()
+        supportActionBar?.apply {
+            setDisplayShowHomeEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
         }
+
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.pref_container, PreferencesFragment())
+                .commit()
 
     }
 
@@ -56,6 +28,10 @@ class PreferenceActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        const val PREF_RECONNECT = "pref_reconnect"
     }
 
 }

@@ -1,17 +1,20 @@
-<android.support.constraint.ConstraintLayout android:id="@+id/color_hex"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/color_hex"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <com.lossydragon.arduinorgb.colorpicker.ColorPickerView
+    <top.defaults.colorpicker.ColorPickerView
         android:id="@+id/colorPickerView_Hex"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
+        app:enableAlpha="false"
+        app:enableBrightness="false"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editText_hex"
@@ -19,15 +22,18 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:background="@drawable/edittext_background"
-        android:textColor="@android:color/white"
-        android:maxLength="7"
-        android:lines="1"
-        android:gravity="center"
         android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        android:gravity="center"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:lines="1"
+        android:maxLength="7"
+        android:textColor="@android:color/white"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/colorPickerView_Hex" />
+        app:layout_constraintTop_toBottomOf="@+id/colorPickerView_Hex"
+        tools:ignore="LabelFor" />
 
 
     <SeekBar
@@ -35,10 +41,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:max="255"
+        android:progress="64"
         app:layout_constraintEnd_toEndOf="@+id/colorPickerView_Hex"
         app:layout_constraintStart_toStartOf="@+id/colorPickerView_Hex"
-        app:layout_constraintTop_toBottomOf="@+id/editText_hex"
-        android:max="255"
-        android:progress="64"/>
+        app:layout_constraintTop_toBottomOf="@+id/editText_hex" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

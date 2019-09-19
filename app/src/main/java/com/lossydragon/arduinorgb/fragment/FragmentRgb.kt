@@ -2,34 +2,19 @@ package com.lossydragon.arduinorgb.fragment
 
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.lossydragon.arduinorgb.R
-import android.widget.ImageButton
 import android.widget.SeekBar
-import android.widget.TextView
-
-import butterknife.BindView
-import butterknife.ButterKnife
+import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.color.colorChooser
 import com.lossydragon.arduinorgb.MainActivity
-import com.lossydragon.arduinorgb.colorpicker.ColorPickerView
+import com.lossydragon.arduinorgb.R
+import kotlinx.android.synthetic.main.fragment_rgb.*
+
 
 class FragmentRgb : Fragment() {
-
-    @BindView(R.id.seekBar_R) internal lateinit var seekBarRed: SeekBar
-    @BindView(R.id.seekBar_G) internal lateinit var seekBarGreen: SeekBar
-    @BindView(R.id.seekBar_B) internal lateinit var seekBarBlue: SeekBar
-    @BindView(R.id.textView_R) internal lateinit var textViewRed: TextView
-    @BindView(R.id.textView_G) internal lateinit var textViewGreen: TextView
-    @BindView(R.id.textView_B) internal lateinit var textViewBlue: TextView
-    @BindView(R.id.dialog_color) internal lateinit var dialogColor: ImageButton
-    @BindView(R.id.colorPickerView) internal lateinit var colorPickerView: ColorPickerView
-
-    private var rgbValues: IntArray? = null
 
     companion object {
         fun newInstance(): FragmentRgb {
@@ -40,24 +25,30 @@ class FragmentRgb : Fragment() {
         }
     }
 
+    private var rgbValues: IntArray = IntArray(4)
+
     override fun onCreateView(inflater: LayoutInflater, viewGroup: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        rgbValues = IntArray(4)
+        return inflater.inflate(R.layout.fragment_rgb, viewGroup, false)
+    }
 
-        val view = inflater.inflate(R.layout.fragment_rgb, viewGroup, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        ButterKnife.bind(this, view)
+        colorPickerView_rgb.subscribe { color, _, _ ->
+            colorHex(color)
+        }
 
-        colorPickerView.subscribe { color, _ -> colorHex(color) }
+        checkSeek()
 
         //Init values to Seekbar values.
-        textViewRed.text = getString(R.string.rgb_R, seekBarRed.progress)
-        textViewGreen.text = getString(R.string.rgb_G, seekBarGreen.progress)
-        textViewBlue.text = getString(R.string.rgb_B, seekBarBlue.progress)
+        textView_R.text = getString(R.string.rgb_R, seekBar_R.progress)
+        textView_G.text = getString(R.string.rgb_G, seekBar_G.progress)
+        textView_B.text = getString(R.string.rgb_B, seekBar_B.progress)
 
-        dialogColor.setOnClickListener {
-            MaterialDialog(this.context as MainActivity)
+        dialog_color.setOnClickListener {
+            MaterialDialog(context!!)
                     .show {
                         title(R.string.dialog_chooseColor)
                                 .colorChooser(primaryColors, primaryColorsSub) { _, color ->
@@ -67,69 +58,68 @@ class FragmentRgb : Fragment() {
                         negativeButton(android.R.string.cancel)
                     }
         }
-
-        checkSeek()
-
-        return view
     }
 
     private fun checkSeek() {
 
-        seekBarRed.setOnSeekBarChangeListener(
-                object : SeekBar.OnSeekBarChangeListener {
+        seekBar_R.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                textView_R.text = getString(R.string.text_R, progress)
+                rgbValues[0] = progress
+            }
 
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        textViewRed.text = getString(R.string.text_R, progress)
-                        rgbValues!![0] = progress
-                    }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                //Nothing
+            }
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                    override fun onStopTrackingTouch(seekBar: SeekBar) {
-                        sendValues()
-                    }
-                }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                sendValues()
+            }
+        }
         )
 
-        seekBarGreen.setOnSeekBarChangeListener(
-                object : SeekBar.OnSeekBarChangeListener {
+        seekBar_G.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                textView_G.text = getString(R.string.text_G, progress)
+                rgbValues[1] = progress
+            }
 
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        textViewGreen.text = getString(R.string.text_G, progress)
-                        rgbValues!![1] = progress
-                    }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                //Nothing
+            }
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                    override fun onStopTrackingTouch(seekBar: SeekBar) {
-                        sendValues()
-                    }
-                }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                sendValues()
+            }
+        }
         )
 
-        seekBarBlue.setOnSeekBarChangeListener(
-                object : SeekBar.OnSeekBarChangeListener {
+        seekBar_B.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                textView_B.text = getString(R.string.text_B, progress)
+                rgbValues[2] = progress
+            }
 
-                    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                        textViewBlue.text = getString(R.string.text_B, progress)
-                        rgbValues!![2] = progress
-                    }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                    override fun onStopTrackingTouch(seekBar: SeekBar) {
-                        sendValues()
-                    }
-                }
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                sendValues()
+            }
+        }
         )
     }
 
     private fun colorHex(color: Int) {
-        seekBarRed.progress = Color.red(color)
-        seekBarGreen.progress = Color.green(color)
-        seekBarBlue.progress = Color.blue(color)
+        seekBar_R.progress = Color.red(color)
+        seekBar_G.progress = Color.green(color)
+        seekBar_B.progress = Color.blue(color)
         sendValues()
     }
 
     //Dirty, but works.
     private fun sendValues() {
-        (this.context as MainActivity).writeRgb(rgbValues!!)
+        (this.context as MainActivity).writeRgb(rgbValues)
     }
 }

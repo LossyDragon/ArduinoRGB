@@ -1,6 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/layout"
     android:descendantFocusability="blocksDescendants">
 
     <TextView
@@ -11,17 +13,17 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="6dp"
         android:textSize="16sp"
-        android:hint="BT Device"/>
+        tools:text="BT Device" />
 
     <TextView
         android:id="@+id/device_mac"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/device_name"
-        android:layout_marginBottom="6dp"
+        android:layout_alignParentStart="true"
         android:layout_marginStart="24dp"
+        android:layout_marginBottom="6dp"
         android:textSize="16sp"
-        android:hint="DE:AD:BE:EF:BA:BE"/>
+        tools:text="DE:AD:BE:EF:BA:BE" />
 
 </RelativeLayout>
